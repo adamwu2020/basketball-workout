@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Basketball Workout Generator</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #0a0a0a;
+      color: #f0f0f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    header h1 {
+      font-size: 2.6rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #f97316;
+    }
+
+    header p {
+      margin-top: 10px;
+      font-size: 1.05rem;
+      color: #888;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      max-width: 640px;
+      width: 100%;
+    }
+
+    .card {
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      border-radius: 16px;
+      padding: 36px 24px;
+      text-align: center;
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+      cursor: pointer;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: #f97316;
+      box-shadow: 0 8px 32px rgba(249, 115, 22, 0.2);
+    }
+
+    .card .icon {
+      font-size: 2.8rem;
+      margin-bottom: 14px;
+      display: block;
+    }
+
+    .card .label {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #f0f0f0;
+    }
+
+    .card .sub {
+      margin-top: 6px;
+      font-size: 0.82rem;
+      color: #666;
+    }
+
+    footer {
+      margin-top: 56px;
+      font-size: 0.78rem;
+      color: #444;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🏀 Workout Generator</h1>
+    <p>Pick a category — we'll pick your drill.</p>
+  </header>
+
+  <div class="grid">
+    {% for key, cat in categories.items() %}
+    <a class="card" href="{{ url_for('workout', category=key) }}">
+      <span class="icon">{{ cat.icon }}</span>
+      <div class="label">{{ cat.label }}</div>
+      <div class="sub">3 drills available</div>
+    </a>
+    {% endfor %}
+  </div>
+
+  <footer>One random drill. Let's get to work.</footer>
+</body>
+</html>
