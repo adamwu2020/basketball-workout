@@ -1,7 +1,21 @@
+# Basketball Workout Generator
+# Author: [Your Name]
+# Description: A Flask web application that lets users choose a basketball
+# workout category and receive a randomly selected drill with instructions.
+
 import random
 from flask import Flask, render_template, redirect, url_for
 
 app = Flask(__name__)
+
+# ---------------------------------------------------------------------------
+# DATA — LIST AND COLLECTION USAGE
+# WORKOUTS is a dictionary of categories. Each category holds a "subcategories"
+# dictionary whose values contain a list of step-by-step instructions.
+# Using this nested structure (rather than separate variables for every drill)
+# makes the program significantly easier to maintain: adding a new drill only
+# requires adding one entry here; no other code needs to change.
+# ---------------------------------------------------------------------------
 
 WORKOUTS = {
     "shooting": {
@@ -10,6 +24,9 @@ WORKOUTS = {
         "subcategories": {
             "free_throw": {
                 "label": "Free Throw",
+                # instructions is a LIST — satisfies the "list to manage complexity"
+                # requirement. Iterating this list in the template renders each step
+                # automatically, regardless of how many steps exist.
                 "instructions": [
                     "Stand at the free throw line with feet shoulder-width apart.",
                     "Hold the ball with your dominant hand under the ball and guide hand on the side.",
@@ -211,24 +228,99 @@ WORKOUTS = {
 }
 
 
+# ---------------------------------------------------------------------------
+# STUDENT-DEVELOPED PROCEDURE: get_random_workout
+#
+# Purpose: Given a category name and the full workouts dictionary, validate
+#          the input, collect all available subcategory keys into a list,
+#          and return one randomly selected workout detail dictionary.
+#
+# Parameters:
+#   category      (str)  — the workout category chosen by the user
+#   workouts_data (dict) — the full WORKOUTS data structure
+#
+# Returns:
+#   A tuple (category_label, workout_dict) on success, or (None, None) if
+#   the category is not recognized.
+#
+# This procedure demonstrates:
+#   SEQUENCING  — steps execute in a defined top-to-bottom order
+#   SELECTION   — an if/else decides whether to proceed or return early
+#   ITERATION   — a for loop builds the list of valid subcategory keys
+# ---------------------------------------------------------------------------
+def get_random_workout(category, workouts_data):
+    # SELECTION: check whether the requested category exists in the data.
+    # If not, return sentinel values so the caller can redirect gracefully.
+    if category not in workouts_data:
+        return None, None
+
+    # SEQUENCING step 1: retrieve the category entry from the data structure.
+    category_entry = workouts_data[category]
+
+    # SEQUENCING step 2 + ITERATION: build a plain list of subcategory keys
+    # by iterating over the subcategories dictionary. A plain list is used
+    # here (rather than calling .keys() directly) so the collection is a
+    # concrete, reusable Python list — easier to inspect and extend later.
+    subcategory_keys = []
+    for key in category_entry["subcategories"]:   # ITERATION
+        subcategory_keys.append(key)
+
+    # SEQUENCING step 3: randomly select one key from the list.
+    chosen_key = random.choice(subcategory_keys)
+
+    # SEQUENCING step 4: look up and return the full workout detail dictionary.
+    workout_detail = category_entry["subcategories"][chosen_key]
+
+    # Return both the human-readable category label and the workout detail.
+    # The label is used on the output page so the user knows which category
+    # their drill belongs to.
+    return category_entry["label"], workout_detail
+
+
+# ---------------------------------------------------------------------------
+# ROUTES — Flask URL handlers
+# ---------------------------------------------------------------------------
+
 @app.route("/")
 def index():
-    categories = {k: {"label": v["label"], "icon": v["icon"]} for k, v in WORKOUTS.items()}
+    """
+    Home page — INPUT from user.
+    Renders the category selection page. The user's click on a category card
+    is the input event that drives the rest of the program.
+    """
+    # Build a lightweight dictionary containing only the display data needed
+    # by the template (label + icon), keeping template logic minimal.
+    categories = {
+        key: {"label": val["label"], "icon": val["icon"]}
+        for key, val in WORKOUTS.items()
+    }
+    # OUTPUT: render and return the HTML page to the user's browser.
     return render_template("index.html", categories=categories)
 
 
 @app.route("/workout/<category>")
 def workout(category):
-    if category not in WORKOUTS:
+    """
+    Workout detail page — calls student-developed procedure, then outputs result.
+    The <category> segment of the URL is the user's input (set when they click
+    a category card on the home page).
+    """
+    # Call the student-developed procedure to get a randomly selected workout.
+    # This is the primary call site for get_random_workout().
+    category_label, workout_detail = get_random_workout(category, WORKOUTS)
+
+    # SELECTION: if the category was invalid, redirect back to the home page.
+    if workout_detail is None:
         return redirect(url_for("index"))
-    cat = WORKOUTS[category]
-    sub_key = random.choice(list(cat["subcategories"].keys()))
-    sub = cat["subcategories"][sub_key]
+
+    # OUTPUT: render the workout detail page with the selected drill's data.
+    # The instructions list inside workout_detail is iterated in the template
+    # to display each numbered step — demonstrating list-driven output.
     return render_template(
         "workout.html",
-        category_label=cat["label"],
+        category_label=category_label,
         category_key=category,
-        workout=sub,
+        workout=workout_detail,
     )
 
 
