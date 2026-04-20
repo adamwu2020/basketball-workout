@@ -1,222 +1,60 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{{ workout.label }} — Basketball Workout</title>
+  <title>{{ workout.label }}</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      background: #0a0a0a;
-      color: #f0f0f0;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 48px 20px;
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background-color: #f5f5f5;
     }
-
-    .back-link {
-      align-self: flex-start;
-      max-width: 680px;
-      width: 100%;
-      margin-bottom: 32px;
-    }
-
-    .back-link a {
-      color: #888;
-      text-decoration: none;
-      font-size: 0.9rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: color 0.15s;
-    }
-
-    .back-link a:hover { color: #f97316; }
-
-    .card {
-      background: #141414;
-      border: 1px solid #2a2a2a;
-      border-radius: 20px;
-      padding: 40px;
-      max-width: 680px;
-      width: 100%;
-    }
-
-    .badge {
-      display: inline-block;
-      background: rgba(249, 115, 22, 0.15);
-      color: #f97316;
-      border: 1px solid rgba(249, 115, 22, 0.3);
-      border-radius: 8px;
-      padding: 4px 12px;
-      font-size: 0.78rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-      margin-bottom: 16px;
-    }
-
     h1 {
-      font-size: 2rem;
-      font-weight: 800;
-      color: #f0f0f0;
-      margin-bottom: 24px;
+      color: #333;
     }
-
-    .meta {
-      display: flex;
-      gap: 24px;
-      margin-bottom: 32px;
-      flex-wrap: wrap;
-    }
-
-    .meta-item {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-
-    .meta-item .meta-label {
-      font-size: 0.72rem;
-      color: #555;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      font-weight: 600;
-    }
-
-    .meta-item .meta-value {
-      font-size: 0.95rem;
-      color: #ccc;
-      font-weight: 500;
-    }
-
-    .divider {
-      border: none;
-      border-top: 1px solid #222;
-      margin-bottom: 32px;
-    }
-
     h2 {
-      font-size: 1rem;
-      font-weight: 700;
-      color: #888;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 20px;
+      color: #555;
+      margin-top: 20px;
     }
-
-    .steps {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
+    .info {
+      margin: 10px 0;
+      color: #444;
     }
-
-    .step {
-      display: flex;
-      gap: 16px;
-      align-items: flex-start;
+    ol {
+      margin-top: 10px;
+      padding-left: 20px;
     }
-
-    .step-num {
-      flex-shrink: 0;
-      width: 28px;
-      height: 28px;
-      background: #f97316;
-      color: #000;
-      border-radius: 50%;
-      font-size: 0.8rem;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-top: 2px;
+    li {
+      margin: 8px 0;
+      color: #333;
+      line-height: 1.5;
     }
-
-    .step-text {
-      font-size: 0.97rem;
-      line-height: 1.65;
-      color: #ccc;
+    .links {
+      margin-top: 30px;
     }
-
-    .actions {
-      margin-top: 40px;
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .btn {
-      padding: 13px 24px;
-      border-radius: 10px;
-      font-size: 0.95rem;
-      font-weight: 700;
-      cursor: pointer;
-      text-decoration: none;
-      border: none;
-      transition: opacity 0.15s, transform 0.1s;
-    }
-
-    .btn:hover { opacity: 0.85; transform: translateY(-1px); }
-
-    .btn-primary {
-      background: #f97316;
-      color: #000;
-    }
-
-    .btn-secondary {
-      background: #1e1e1e;
-      color: #ccc;
-      border: 1px solid #333;
+    .links a {
+      margin-right: 20px;
+      color: #ff8c00;
     }
   </style>
 </head>
 <body>
+  <h1>{{ workout.label }}</h1>
+  <p style="color: #777;">Category: {{ category_label }}</p>
 
-  <div class="back-link">
-    <a href="{{ url_for('index') }}">← Back to categories</a>
+  <div class="info"><strong>Duration:</strong> {{ workout.duration }}</div>
+  <div class="info"><strong>Reps:</strong> {{ workout.reps }}</div>
+  <div class="info"><strong>Focus:</strong> {{ workout.focus }}</div>
+
+  <h2>Instructions</h2>
+  <ol>
+    {% for step in workout.instructions %}
+    <li>{{ step }}</li>
+    {% endfor %}
+  </ol>
+
+  <div class="links">
+    <a href="{{ url_for('workout', category=category_key) }}">Give me a different drill</a>
+    <a href="{{ url_for('index') }}">Back to categories</a>
   </div>
-
-  <div class="card">
-    <div class="badge">{{ category_label }}</div>
-    <h1>{{ workout.label }}</h1>
-
-    <div class="meta">
-      <div class="meta-item">
-        <span class="meta-label">Duration</span>
-        <span class="meta-value">{{ workout.duration }}</span>
-      </div>
-      <div class="meta-item">
-        <span class="meta-label">Volume</span>
-        <span class="meta-value">{{ workout.reps }}</span>
-      </div>
-      <div class="meta-item">
-        <span class="meta-label">Focus</span>
-        <span class="meta-value">{{ workout.focus }}</span>
-      </div>
-    </div>
-
-    <hr class="divider" />
-
-    <h2>Instructions</h2>
-    <ol class="steps">
-      {% for step in workout.instructions %}
-      <li class="step">
-        <span class="step-num">{{ loop.index }}</span>
-        <span class="step-text">{{ step }}</span>
-      </li>
-      {% endfor %}
-    </ol>
-
-    <div class="actions">
-      <a class="btn btn-primary" href="{{ url_for('workout', category=category_key) }}">Try a different drill</a>
-      <a class="btn btn-secondary" href="{{ url_for('index') }}">Change category</a>
-    </div>
-  </div>
-
 </body>
 </html>
